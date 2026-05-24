@@ -70,7 +70,7 @@ Edit `config.json` to customize categories and keywords:
   "input_folder": "./input",
   "output_folder": "./processed",
   "archive_originals": true,
-  "max_image_width": 1200,
+  "max_image_width": 1000,
   "jpeg_quality": 85
 }
 ```
@@ -103,6 +103,25 @@ sortyr/
 ├── requirements.txt
 └── test_app.py         # Basic tests
 ```
+
+## Changelog
+
+### v1.1.0 — 2026-05-24
+- **Image resizing**: mobile photos auto-resized to 1000px width (was 1200), aspect ratio preserved, EXIF kept
+- **Multi-page documents**: put photos in a subfolder inside input → auto-merged into single PDF, then OCR + classify as one document
+- **Subfolder cleanup**: merged subfolders removed automatically after PDF creation
+
+### v1.0.0 — 2026-05-23
+- Initial release
+- macOS native OCR via Apple Vision framework
+- PDF + image support (PDF, JPEG, PNG, WebP, TIFF)
+- Rule-based keyword classification with configurable categories
+- Automatic date extraction from document content
+- Smart file naming: `CATEGORY-YYYY-MM-DD-Description.ext`
+- Duplicate handling with auto-numbered suffixes
+- Original file archiving
+- tkinter GUI with folder selection + processing
+- JSON logging
 
 ## License
 
