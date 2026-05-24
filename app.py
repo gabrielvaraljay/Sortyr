@@ -20,8 +20,13 @@ from image_processor import resize_image, merge_images_to_pdf
 from pdf_processor import extract_text_from_pdf
 from file_mover import move_file
 from renamer import generate_filename, ensure_unique_filename
+from auto_rotate import auto_rotate_image
+
+import shutil as _shutil
+from datetime import datetime, timedelta
 
 IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp', 'tiff'}
+TRASH_RETENTION_DAYS = 7
 
 class SortyrApp:
     def __init__(self, root):
@@ -40,6 +45,9 @@ class SortyrApp:
         
         # Status tracking
         self.is_processing = False
+        
+        # Clean old trash on startup
+        self.clean_old_trash()
         
     def create_widgets(self):
         # Input folder selection
@@ -112,6 +120,24 @@ class SortyrApp:
         self.log_text.see(tk.END)
         self.root.update_idletasks()
         
+    def clean_old_trash(self):
+        """Remove files older than TRASH_RETENTION_DAYS from the trash folder."""
+        output = self.output_folder_var.get() if self.output_folder_var.get() else self.config.get('output_folder', './processed')
+        trash_dir = os.path.join(output, '_trash')
+        if not os.path.exists(trash_dir):
+            return
+        cutoff = datetime.now() - timedelta(days=TRASH_RETENTION_DAYS)
+        removed = 0
+        for f in os.listdir(trash_dir):
+            fp = os.path.join(trash_dir, f)
+            if os.path.isfile(fp):
+                mtime = datetime.fromtimestamp(os.path.getmtime(fp))
+                if mtime < cutoff:
+                    os.remove(fp)
+                    removed += 1
+        if removed:
+            print(f"Cleaned {removed} files from trash (older than {TRASH_RETENTION_DAYS} days)")
+
     def start_processing(self):
         if self.is_processing:
             return
@@ -163,7 +189,6 @@ class SortyrApp:
                         if result:
                             self.log_message(f"Created {pdf_name} ({len(images)} pages)")
                             # Remove subfolder after successful merge
-                            import shutil as _shutil
                             _shutil.rmtree(subfolder)
                         else:
                             self.log_message(f"Failed to merge images in '{entry}/'")
@@ -205,6 +230,10 @@ class SortyrApp:
                             processed_text = ocr_text if ocr_text else ""
                     
                     elif file_extension in ['jpg', 'jpeg', 'png', 'webp', 'tiff']:
+                        # Auto-rotate based on OCR confidence
+                        self.log_message(f"  Checking rotation...")
+                        filepath = auto_rotate_image(filepath)
+
                         # Resize large images (mobile photos) to 1000px width
                         max_w = self.config.get('max_image_width', 1000)
                         resized_path = resize_image(filepath, max_w,
@@ -240,6 +269,15 @@ class SortyrApp:
                     # Extract meaningful description from content
                     description = find_first_meaningful_phrase(processed_text, 4) if processed_text else "document"
                     
+                    # Copy original to temp trash (7-day retention) before moving
+                    trash_dir = os.path.join(output_folder, '_trash')
+                    os.makedirs(trash_dir, exist_ok=True)
+                    trash_name = f"{time.strftime('%Y%m%d_%H%M%S')}_{os.path.basename(filepath)}"
+                    try:
+                        _shutil.copy2(filepath, os.path.join(trash_dir, trash_name))
+                    except Exception:
+                        pass  # Non-critical
+
                     # Move file to appropriate category folder
                     new_filepath = move_file(filepath, category, date, description, output_folder, 
                                            self.config.get("archive_originals", True))
