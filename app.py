@@ -196,7 +196,15 @@ class SortyrApp:
                         result = merge_images_to_pdf(images, pdf_path)
                         if result:
                             self.log_message(f"Created {pdf_name} ({len(images)} pages)")
-                            # Remove subfolder after successful merge
+                            # Save originals to trash before removing
+                            trash_dir = os.path.join(output_folder, '_trash')
+                            os.makedirs(trash_dir, exist_ok=True)
+                            for img_path in images:
+                                trash_name = f"{time.strftime('%Y%m%d_%H%M%S')}_{os.path.basename(img_path)}"
+                                try:
+                                    _shutil.copy2(img_path, os.path.join(trash_dir, trash_name))
+                                except Exception:
+                                    pass
                             _shutil.rmtree(subfolder)
                         else:
                             self.log_message(f"Failed to merge images in '{entry}/'")
