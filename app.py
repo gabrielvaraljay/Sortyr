@@ -66,7 +66,9 @@ class SortyrApp:
         process_frame = ttk.Frame(self.root, padding="10")
         process_frame.grid(row=2, column=0, columnspan=2, sticky=(tk.W, tk.E))
         
-        self.process_button = ttk.Button(process_frame, text="Process Documents", command=self.start_processing)
+        self.process_button = tk.Button(process_frame, text="▶  Process Documents", command=self.start_processing,
+                                        bg="#6c5ce7", fg="white", activebackground="#5a4bd1", activeforeground="white",
+                                        font=("Helvetica", 14, "bold"), padx=20, pady=10, relief="flat", cursor="hand2")
         self.process_button.grid(row=0, column=0, pady=10)
         
         # Status label
@@ -124,7 +126,7 @@ class SortyrApp:
             
         # Start processing in a separate thread
         self.is_processing = True
-        self.process_button.config(state="disabled")
+        self.process_button.config(state="disabled", text="⏳  Processing...", bg="#636e72")
         self.update_status("Processing...")
         thread = Thread(target=self.process_documents, args=(input_folder, output_folder))
         thread.daemon = True
@@ -261,8 +263,8 @@ class SortyrApp:
             self.log_func("Processing error", level="ERROR", error=str(e))
         finally:
             self.is_processing = False
-            self.process_button.config(state="normal")
-            self.update_status("Completed")
+            self.process_button.config(state="normal", text="▶  Process Documents", bg="#6c5ce7")
+            self.update_status("Completed ✅")
 
 def main():
     root = tk.Tk()

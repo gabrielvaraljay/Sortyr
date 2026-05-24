@@ -53,12 +53,42 @@
       "solicitor",
       "court",
       "contract",
-      "agreement"
+      "agreement",
+      "police",
+      "Metropolitan Police",
+      "crime",
+      "offence",
+      "prosecution",
+      "witness",
+      "magistrate",
+      "barrister",
+      "legal"
     ],
     "Personal": [
       "passport",
       "driving licence",
       "birth certificate"
+    ],
+    "Vehicle": [
+      "DVLA",
+      "MOT",
+      "car",
+      "Tesla",
+      "vehicle",
+      "registration",
+      "road tax",
+      "parking",
+      "PCN",
+      "congestion"
+    ],
+    "Immigration": [
+      "visa",
+      "Home Office",
+      "BRP",
+      "immigration",
+      "biometric",
+      "residence permit",
+      "settled status"
     ]
   },
   "input_folder": "./input",
