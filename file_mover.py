@@ -26,16 +26,12 @@ def move_file(file_path: str, category: str, date: str, description: str,
         final_filepath = os.path.join(category_folder, new_filename)
         final_filepath = ensure_unique_filename(final_filepath)
         
-        # Move the file
-        shutil.move(file_path, final_filepath)
-        
-        # Archive original if requested
+        # Archive original BEFORE moving (so the source file still exists)
         if archive_originals:
-            archive_folder = os.path.join(os.path.dirname(output_folder), "archive_originals")
+            archive_folder = os.path.join(output_folder, "archive_originals")
             if not os.path.exists(archive_folder):
                 os.makedirs(archive_folder)
             
-            # Get a unique archive path (this handles duplicate filenames)
             archive_path = os.path.join(archive_folder, os.path.basename(file_path))
             counter = 1
             while os.path.exists(archive_path):
@@ -43,7 +39,10 @@ def move_file(file_path: str, category: str, date: str, description: str,
                 archive_path = os.path.join(archive_folder, f"{name}-{counter}{ext}")
                 counter += 1
             
-            shutil.copy(file_path, archive_path)  # Copy original to archive
+            shutil.copy2(file_path, archive_path)
+
+        # Move the file
+        shutil.move(file_path, final_filepath)
         
         return final_filepath
     except Exception as e:

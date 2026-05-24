@@ -63,8 +63,13 @@ def extract_organisation(text: str) -> str:
     # 1. Check known organisations (longest match first to avoid partial matches)
     sorted_orgs = sorted(KNOWN_ORGS.keys(), key=len, reverse=True)
     for org_key in sorted_orgs:
-        if org_key in text_lower:
-            return KNOWN_ORGS[org_key]
+        # Short keys (<=4 chars) need word boundary to avoid substring false positives
+        if len(org_key) <= 4:
+            if re.search(r'\b' + re.escape(org_key) + r'\b', text_lower):
+                return KNOWN_ORGS[org_key]
+        else:
+            if org_key in text_lower:
+                return KNOWN_ORGS[org_key]
 
     # 2. Try to extract from common document patterns
     # "From: Company Name" or "Company Name Ltd/Inc/LLC"
