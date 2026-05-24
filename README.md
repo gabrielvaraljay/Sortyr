@@ -8,11 +8,14 @@ A macOS document sorting app for Apple Silicon. Automatically organizes document
 
 - **Native macOS OCR** — Uses Apple's Vision framework directly, no Tesseract needed
 - **PDF & image support** — PDF, JPEG, PNG, WebP, TIFF
-- **Rule-based classification** — Configurable keyword categories
+- **Smart classification** — Auto-detects vendor/organisation name from document content (no keyword config needed)
 - **Automatic date extraction** — Detects dates in document content
 - **Smart file naming** — `CATEGORY-YYYY-MM-DD-Description.ext`
 - **Duplicate handling** — Auto-numbered suffixes
+- **Auto-rotation** — Detects and fixes rotated/upside-down scans via OCR confidence
+- **7-day trash** — Originals kept in `_trash/` for 7 days before auto-cleanup
 - **Original archiving** — Keeps originals safely backed up
+- **Persistent settings** — Folder paths survive app updates (`~/Library/Application Support/Sortyr/`)
 - **Simple GUI** — tkinter-based, no dependencies beyond Python
 
 ## Requirements
@@ -57,23 +60,9 @@ processed/
 
 ## Configuration
 
-Edit `config.json` to customize categories and keywords:
+Settings are stored in `~/Library/Application Support/Sortyr/config.json` and persist across app updates.
 
-```json
-{
-  "categories": {
-    "NHS": ["NHS", "hospital", "appointment", "GP"],
-    "HMRC": ["HMRC", "tax", "self assessment", "PAYE"],
-    "Bank": ["bank", "statement", "transaction"],
-    "Invoices": ["invoice", "receipt", "payment"]
-  },
-  "input_folder": "./input",
-  "output_folder": "./processed",
-  "archive_originals": true,
-  "max_image_width": 1000,
-  "jpeg_quality": 85
-}
-```
+Classification is automatic -- the app reads the document and extracts the vendor/organisation name to use as the folder name. Common orgs (NHS, HMRC, Amazon, etc.) are normalised to clean names. No keyword config needed.
 
 ## How OCR Works
 
@@ -99,12 +88,20 @@ sortyr/
 ├── pdf_processor.py    # PDF text extraction with OCR fallback
 ├── file_mover.py       # File sorting + duplicate handling
 ├── logger_module.py    # JSON logging
-├── config.json         # Category configuration
+├── auto_rotate.py      # OCR-based rotation detection
+├── config.json         # Default configuration
 ├── requirements.txt
 └── test_app.py         # Basic tests
 ```
 
 ## Changelog
+
+### v1.2.2 — 2026-05-24
+- **Smart classifier**: auto-detects vendor/org name from document text, no keyword lists needed
+- **Auto-rotation**: tries all 4 orientations, picks the one with best OCR confidence
+- **7-day trash**: originals saved to `_trash/` before processing, auto-cleaned after 7 days
+- **Persistent settings**: folder paths saved to `~/Library/Application Support/Sortyr/`, survive rebuilds
+- **Subfolder merge safety**: originals backed up to trash before merge + delete
 
 ### v1.1.0 — 2026-05-24
 - **Image resizing**: mobile photos auto-resized to 1000px width (was 1200), aspect ratio preserved, EXIF kept
