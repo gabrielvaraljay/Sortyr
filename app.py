@@ -190,6 +190,11 @@ class SortyrApp:
                         if os.path.splitext(f)[1].lower().lstrip('.') in IMAGE_EXTENSIONS
                     ])
                     if images:
+                        # Auto-rotate each image before merging
+                        for idx, img_path in enumerate(images):
+                            self.log_message(f"  Checking rotation for page {idx+1}...")
+                            auto_rotate_image(img_path)
+
                         pdf_name = f"{entry}.pdf"
                         pdf_path = os.path.join(input_folder, pdf_name)
                         self.log_message(f"Merging {len(images)} images from '{entry}/' -> {pdf_name}")
@@ -209,9 +214,11 @@ class SortyrApp:
                         else:
                             self.log_message(f"Failed to merge images in '{entry}/'")
 
-            # Get all files in input folder
+            # Get all files in input folder (skip hidden files like .DS_Store)
             files = []
             for filename in os.listdir(input_folder):
+                if filename.startswith('.'):
+                    continue
                 filepath = os.path.join(input_folder, filename)
                 if os.path.isfile(filepath):
                     files.append(filepath)
@@ -267,8 +274,8 @@ class SortyrApp:
                         self.log_message(f"Unsupported file type: {file_extension}")
                         continue
 
-                    # Classify document
-                    category = classify_document(processed_text, self.config["categories"])
+                    # Classify document (smart org extraction, no keyword config needed)
+                    category = classify_document(processed_text)
                     if not processed_text:
                         processed_text = ""
 
