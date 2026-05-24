@@ -1,0 +1,69 @@
+{
+  "categories": {
+    "NHS": [
+      "NHS",
+      "hospital",
+      "appointment",
+      "GP",
+      "clinic",
+      "prescription"
+    ],
+    "HMRC": [
+      "HMRC",
+      "tax",
+      "self assessment",
+      "PAYE",
+      "national insurance"
+    ],
+    "Bank": [
+      "bank",
+      "statement",
+      "transaction",
+      "account",
+      "Monzo",
+      "Barclays"
+    ],
+    "Invoices": [
+      "invoice",
+      "receipt",
+      "payment",
+      "order",
+      "Amazon"
+    ],
+    "Insurance": [
+      "insurance",
+      "policy",
+      "claim",
+      "premium"
+    ],
+    "Utilities": [
+      "electricity",
+      "gas",
+      "water",
+      "broadband",
+      "council tax"
+    ],
+    "School": [
+      "school",
+      "nursery",
+      "Ofsted",
+      "term dates"
+    ],
+    "Legal": [
+      "solicitor",
+      "court",
+      "contract",
+      "agreement"
+    ],
+    "Personal": [
+      "passport",
+      "driving licence",
+      "birth certificate"
+    ]
+  },
+  "input_folder": "./input",
+  "output_folder": "./processed",
+  "archive_originals": true,
+  "max_image_width": 1000,
+  "jpeg_quality": 85
+}
